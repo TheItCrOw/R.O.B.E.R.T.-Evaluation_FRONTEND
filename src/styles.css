@@ -1,0 +1,40 @@
+/* You can add global styles to this file, and also import other style files */
+*{
+}
+
+.card-shadow{
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+}
+
+.bg-logo{
+    position: absolute;
+    width: 300px;
+    bottom: 10%;
+    transform: translate(-50%, 0%);
+    height: auto;
+    opacity: 0.15;
+    left:calc(50%);
+    z-index: -1;
+    object-fit: contain;
+}
+
+.flexed{
+    display: flex !important;
+}
+
+.rounded-0{
+    border-radius: 0;
+}
+
+.text-left{
+    text-align: left;
+}
+
+.display-none{
+    display: none;
+}
+
+.fade-in {
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+  }
