@@ -138,8 +138,9 @@ import { Observable, map, take } from "rxjs";
             </h5>
             <!-- context -->
             <ul>
-              <!-- TODO: For some reason, the context of the datasets are a bit faulty. So delete the last two items, they are wrong. -->
-              <li *ngFor="let part of currentDataset.context?.split('[ITEM]')?.slice(0, -2)">
+              <!-- TODO: For some reason, the context of the datasets are a bit faulty. So delete the last two items, they are wrong.
+              If thats the case, use: ?.slice(0, -2) -->
+              <li *ngFor="let part of currentDataset.context?.split('[ITEM]')">
                 {{ part.slice(2) }}
               </li>
             </ul>
