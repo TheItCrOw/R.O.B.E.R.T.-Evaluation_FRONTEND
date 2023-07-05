@@ -13,7 +13,7 @@ import { Observable, map, take } from "rxjs";
           Rate the following {{ currentDataset.type }}
         </h1>
         <div class="row m-0 p-0 mt-5">
-          <div class="col-md-7 card-shadow bg-light p-2 text-dark text-center">
+          <div class="col-md-8 card-shadow bg-light p-2 text-dark text-center">
             <h5
               class="text-center text-black bg-warning pb-1 pt-1 card-shadow mb-3"
             >
@@ -26,21 +26,36 @@ import { Observable, map, take } from "rxjs";
               conducting dialogs.
             </p>
             <hr class="" /> -->
-            <p>
-              <b>Have a look at the provided context first.</b> <br />A student said/asked:
+            <p class="mb-2">
+              <b>Have a look at the following context:</b>
+            </p>
+            <!-- context -->
+            <ul>
+              <!-- TODO: For some reason, the context of the datasets are a bit faulty. So delete the last two items, they are wrong.
+              If thats the case, use: ?.slice(0, -2) -->
+              <li
+                *ngFor="let part of currentDataset.context?.split('[ITEM]')"
+                style="text-align: left;"
+              >
+                {{ part.slice(2) }}
+              </li>
+            </ul>
+            <hr/>
+            <p class="mb-1">
+              <b>A student said/asked:</b>
             </p>
             <p class="fw-bold text-primary">
               {{ currentDataset.instruction }}
             </p>
             <hr />
-            <p>Rob answered with:</p>
+            <p class="mb-1"><b>Rob answered with:</b></p>
             <p class="fw-bold" style="color:purple">
               {{ currentDataset.output }}
             </p>
             <hr />
             <p class="fw-bold">
-              Rate Rob's answer on a scale from 1 to 10. <br />Important: Keep in
-              mind the provided list of criterias.
+              Rate Rob's answer on a scale from 1 to 5. <br />Important: Keep
+              in mind the provided list of criterias.
             </p>
             <!-- rating buttons -->
             <div
@@ -132,18 +147,7 @@ import { Observable, map, take } from "rxjs";
             </div>
           </div>
 
-          <div class="col-md-5 p-2 card-shadow bg-secondary text-light">
-            <h5 class="text-center text-dark pb-1 pt-1 card-shadow bg-light">
-              The context
-            </h5>
-            <!-- context -->
-            <ul>
-              <!-- TODO: For some reason, the context of the datasets are a bit faulty. So delete the last two items, they are wrong.
-              If thats the case, use: ?.slice(0, -2) -->
-              <li *ngFor="let part of currentDataset.context?.split('[ITEM]')">
-                {{ part.slice(2) }}
-              </li>
-            </ul>
+          <div class="col-md-4 p-2 card-shadow bg-secondary text-light">
             <div
               class="flexed justify-content-between align-items-center card-shadow p-1 bg-light"
             >
@@ -162,9 +166,10 @@ import { Observable, map, take } from "rxjs";
             </div>
             <ul class="criterias-list display-none mt-2">
               <li>
-                <b class="text-warning">IMPORTANT:</b> Rob must <b>not make up
-                information (he likes to do that!)</b> but only answer when he truly knows the answer off
-                of the <b>provided context</b>. If the students question cannot be
+                <b class="text-warning">IMPORTANT:</b> Rob must
+                <b>not make up information (he likes to do that!)</b> but only
+                answer when he truly knows the answer off of the
+                <b>provided context</b>. If the students question cannot be
                 answered with the provided context, Rob should excuse himself
                 and state, that he does not know.
               </li>
@@ -266,7 +271,7 @@ export class EvaluationComponent implements OnInit {
   }
 
   // UI stuff =============================
-  buttons: number[] = Array(10)
+  buttons: number[] = Array(5)
     .fill(0)
     .map((_, i) => i + 1);
   canSaveRating: boolean = false;

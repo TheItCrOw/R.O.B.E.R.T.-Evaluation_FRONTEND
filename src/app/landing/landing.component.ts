@@ -21,7 +21,7 @@ import { Component } from "@angular/core";
       </p>
       <p class="text-light text-center">
         All you have to do is to read the instruction/question/chat-history, look at the given information and then rate Rob's answer with a number between 
-        1-10. You will have a list of criterias to better rate Rob's answer once you start the evaluation.
+        1-5. You will have a list of criterias to better rate Rob's answer once you start the evaluation.
       </p>
       <p class="text-warning text-center">
         There is no start to the evaluation, neither an end. Just press "Start", rate as many datasets as you'd like and then just close the window. 
