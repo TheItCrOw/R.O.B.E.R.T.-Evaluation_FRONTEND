@@ -242,6 +242,11 @@ import { Observable, map, take } from "rxjs";
               </button>
             </div>
             <ul class="help-list display-none mt-2">
+            <li>
+                Rob's answers can sometimes be wrongly formatted, containing chunks like: "### Input" 
+                or repreating the question, answering nonsensical and so on. Just rate those with 1 point 
+                and check the correct comment to it. 
+              </li>
               <li>
                 This is a fictional scenario, where Rob is a robotic assistant
                 in a virtual reality world. He was trained to be an assistant to
