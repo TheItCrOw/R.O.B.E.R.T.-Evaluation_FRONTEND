@@ -8,9 +8,10 @@ import { Observable, map, take } from "rxjs";
   selector: "app-evaluation",
   template: `
     <ng-container *ngIf="currentDataset$ | async as currentDataset">
+      <span class="display-none" id="dataset">{{ currentDataset | json }}</span>
       <div class="container pt-5 pb-5 text-white-50">
         <h1 class="text-light text-center">
-          Rate the following {{ currentDataset.type }}
+          Rate the following <b class="text-warning">{{ currentDataset.type }}</b>
         </h1>
         <div class="row m-0 p-0 mt-5">
           <div class="col-md-8 card-shadow bg-light p-2 text-dark text-center">
@@ -26,27 +27,48 @@ import { Observable, map, take } from "rxjs";
               conducting dialogs.
             </p>
             <hr class="" /> -->
-            <p class="mb-2">
-              <b>Have a look at the following context:</b>
-            </p>
-            <!-- context -->
-            <ul>
-              <!-- TODO: For some reason, the context of the datasets are a bit faulty. So delete the last two items, they are wrong.
+            <div *ngIf="currentDataset.type == 'instruction'">
+              <p class="mb-2">
+                <b>Have a look at the following context:</b>
+              </p>
+              <!-- context -->
+              <ul>
+                <!-- TODO: For some reason, the context of the datasets are a bit faulty. So delete the last two items, they are wrong.
               If thats the case, use: ?.slice(0, -2) -->
-              <li
-                *ngFor="let part of currentDataset.context?.split('[ITEM]')"
-                style="text-align: left;"
-              >
-                {{ part.slice(2) }}
-              </li>
-            </ul>
-            <hr/>
+                <li
+                  *ngFor="
+                    let part of currentDataset.context
+                      ?.split('[ITEM]')
+                      ?.slice(0, -2)
+                  "
+                  style="text-align: left;"
+                >
+                  {{ part.slice(2) }}
+                </li>
+              </ul>
+              <hr />
+            </div>
             <p class="mb-1">
-              <b>A student said/asked:</b>
+              <b *ngIf="currentDataset.type == 'instruction'"
+                >A student said/asked:</b
+              >
+              <b *ngIf="currentDataset.type == 'dialog'"
+                >Read the following dialog:</b
+              >
             </p>
-            <p class="fw-bold text-primary">
-              {{ currentDataset.instruction }}
-            </p>
+            <div class="fw-bold text-primary">
+              <p *ngIf="currentDataset.type == 'instruction'">
+                {{ currentDataset.instruction }}
+              </p>
+              <div *ngIf="currentDataset.type == 'dialog'">
+                <div
+                  class="mb-0"
+                  *ngFor="let part of currentDataset.input?.split('\n')"
+                >
+                  <p class="mb-0">{{ part }}</p>
+                </div>
+              </div>
+            </div>
             <hr />
             <p class="mb-1"><b>Rob answered with:</b></p>
             <p class="fw-bold" style="color:purple">
@@ -54,8 +76,10 @@ import { Observable, map, take } from "rxjs";
             </p>
             <hr />
             <p class="fw-bold">
-              Rate Rob's answer on a scale from 1 to 5. <br />Important: Keep
-              in mind the provided list of criterias.
+              Rate Rob's answer on a scale from 1 to 5. 
+              <span *ngIf="currentDataset.type == 'dialog'">(Don't rate the dialog, just Rob's answer)</span>
+              <br />Important: Keep in
+              mind the provided list of criterias.
             </p>
             <!-- rating buttons -->
             <div
@@ -74,6 +98,18 @@ import { Observable, map, take } from "rxjs";
               <p class="mb-2">
                 <b>Optional comment:</b> What faults did you find?
               </p>
+              <div
+                class="flexed align-items-center justify-content-between w-100"
+              >
+                <label class="m-0 text-left"
+                  >Rob's answer was empty.</label
+                >
+                <input
+                  class=" w-auto m-0"
+                  type="checkbox"
+                  class="comment-input"
+                />
+              </div>
               <div
                 class="flexed align-items-center justify-content-between w-100"
               >
@@ -102,7 +138,7 @@ import { Observable, map, take } from "rxjs";
                 class="flexed align-items-center justify-content-between w-100"
               >
                 <label class="m-0 text-left"
-                  >Rob's answer was nonsensical.</label
+                  >Rob's answer was nonsensical and/or wrongly formatted.</label
                 >
                 <input
                   class=" w-auto m-0"
@@ -114,7 +150,7 @@ import { Observable, map, take } from "rxjs";
                 class="flexed align-items-center justify-content-between w-100"
               >
                 <label class="m-0 text-left"
-                  >Rob's answer didn't feel natural and wasn't proactive.</label
+                  >Rob's answer didn't feel quiet natural.</label
                 >
                 <input
                   class="w-auto m-0"
@@ -173,6 +209,11 @@ import { Observable, map, take } from "rxjs";
                 answered with the provided context, Rob should excuse himself
                 and state, that he does not know.
               </li>
+              <li>
+                <b class="text-warning">Dialogs</b> don't have a context. In that case, 
+                decide whether the given information in the answer seems logical. They  
+                also have the highest chance of being nonsensical or wrongly formatted.
+              </li>
               <li>Rob's answer must never contain any bias or toxicity.</li>
               <li>
                 If the question is convoluted or nonsensical, Rob needs to
@@ -219,6 +260,7 @@ import { Observable, map, take } from "rxjs";
               </li>
             </ul>
           </div>
+          <span class="text-secondary" style="font-style: italic; text-size:small">{{currentDataset.model}}</span>
         </div>
 
         <button class="mt-3 btn btn-danger rounded-0" [routerLink]="'/'">
@@ -241,19 +283,16 @@ export class EvaluationComponent implements OnInit {
   }
 
   updateDatasetProperties(rating: number, comments: string, isRated: boolean) {
-    this.currentDataset$.subscribe((dataset) => {
-      // Modify the dataset properties
-      dataset.rating = rating;
-      dataset.comment = comments;
-      dataset.isRated = isRated;
-
-      // Store the updated dataset
-      this.datasetService.updateDataset(dataset._id || "", dataset).subscribe({
-        next: () => {
-          // Refresh the page and go next
-          window.location.reload();
-        },
-      });
+    var dataset = JSON.parse($('#dataset').html())
+    dataset.rating = rating;
+    dataset.isRated = isRated;
+    dataset.comment = comments;
+    console.log(dataset);
+    this.datasetService.updateDataset(dataset._id || "", dataset).subscribe({
+      next: () => {
+        // Refresh the page and go next
+        window.location.reload();
+      },
     });
   }
 
