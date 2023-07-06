@@ -11,8 +11,8 @@ import { Component } from "@angular/core";
       <hr class="mt-1 mb-4"/>
       <p class="mt-0 text-center">
         I have trained multiple versions of a language model called Rob. Rob aims to be a virtual reality assistant that follows instructions 
-        and answers questions. To simplify: He is a "chat bot" and since I trained multiple versions, I want to know which ones the best, so expect 
-        good and bad results.  
+        and answers questions. To simplify: He is a "chat bot" and since I trained multiple versions, I want to know which ones the best, 
+        <b>so expect good but also a lot of bad results.</b>  
       </p>
       <p class="text-center">
         To do so, you will be given an instruction or a question, followed by an answer. Occasionally, you will also see a chat-history 
