@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { AfterViewInit, Component, OnInit } from "@angular/core";
 import * as $ from "jquery";
 import { Dataset } from "../dataset";
 import { DatasetService } from "../dataset.service";
@@ -264,6 +264,7 @@ import { Observable, map, take } from "rxjs";
                 given criterias.
               </li>
             </ul>
+            <h5 class="mt-5 text-center">Datasets rated: <span class="rated-count">{{this.doneRatingsCount}}</span></h5>
           </div>
           <span class="text-secondary" style="font-style: italic; text-size:small">{{currentDataset.model}}</span>
         </div>
@@ -278,13 +279,43 @@ import { Observable, map, take } from "rxjs";
   `,
   styles: [],
 })
-export class EvaluationComponent implements OnInit {
+export class EvaluationComponent implements OnInit, AfterViewInit {
   currentDataset$: Observable<Dataset> = new Observable();
   constructor(private datasetService: DatasetService) { }
+  doneRatingsCount: number = 0;
 
   ngOnInit(): void {
     // On init (on reload) we want to fetch a dataset and fill it into the UI
     this.currentDataset$ = this.datasetService.getRandomUnratedDataset();
+  }
+
+  ngAfterViewInit(): void {
+    // Also get the cookie where we store the amount of ratings
+    var cookieValue = this.getCookie("ratingsDone");
+    if (cookieValue != undefined) {
+      this.doneRatingsCount = parseInt(cookieValue);
+    }
+  }
+
+  setCookie(name: string, val: string) {
+    const date = new Date();
+    const value = val;
+
+    // Set it expire in 7 days
+    date.setTime(date.getTime() + (14 * 24 * 60 * 60 * 1000));
+
+    // Set it
+    document.cookie = name + "=" + value + "; expires=" + date.toUTCString() + "; path=/";
+  }
+
+  getCookie(name: string) {
+    const value = "; " + document.cookie;
+    const parts = value.split("; " + name + "=");
+
+    if (parts.length == 2) {
+      return parts.pop()?.split(";").shift();
+    }
+    return undefined;
   }
 
   updateDatasetProperties(rating: number, comments: string, isRated: boolean) {
@@ -295,6 +326,10 @@ export class EvaluationComponent implements OnInit {
     console.log(dataset);
     this.datasetService.updateDataset(dataset._id || "", dataset).subscribe({
       next: () => {
+        // Store the amount of ratings
+        this.doneRatingsCount = this.doneRatingsCount + 1;
+        console.log(this.doneRatingsCount);
+        this.setCookie("ratingsDone", this.doneRatingsCount.toString());
         // Refresh the page and go next
         window.location.reload();
       },
