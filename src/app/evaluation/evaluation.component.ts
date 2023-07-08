@@ -76,7 +76,7 @@ import { Observable, map, take } from "rxjs";
             </p>
             <hr />
             <p class="fw-bold">
-              Rate Rob's answer on a scale from 1 to 5 (1 being nonsensical, 5 being nearly perfect). 
+              Rate Rob's answer on a scale from 1 (nonsense) to 5 (perfect). 
               <span *ngIf="currentDataset.type == 'dialog'">(Don't rate the dialog, just Rob's answer)</span>
               <br />Important: Keep in
               mind the provided list of criterias.
